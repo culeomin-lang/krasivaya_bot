@@ -1,18 +1,9 @@
 import logging
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
-from telegram.request import HTTPXRequest
 
-TOKEN = "8699201233:AAFg0xXHxxYuaXOrIVxvxEQKsMikx0T5oZ0"
-
-# MTProto прокси
-PROXY = {
-    "proxy_url": "socks5://pl1.mtproxy.link-host.net:7777",
-    "urllib3_proxy_kwargs": {
-        "username": "",
-        "password": "",
-    }
-}
+TOKEN = os.environ.get("TOKEN", "8699201233:AAFg0xXHxxYuaXOrIVxvxEQKsMikx0T5oZ0")
 
 PDF_LINKS = {
     "golden_ring": "https://drive.google.com/your_link_1",
@@ -63,15 +54,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.pre_checkout_query.answer(ok=True)
 
 def main():
-    # Создаём request с прокси
-    request = HTTPXRequest(proxy="socks5://pl1.mtproxy.link-host.net:7777")
-    app = Application.builder().token(TOKEN).request(request).build()
+    app = Application.builder().token(TOKEN).build()
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.ALL, handle_message))
     
-    print("Бот запущен. Нажми Ctrl+C для остановки.")
+    print("Бот запущен")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
